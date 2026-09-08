@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply text-slate-900 bg-slate-50 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
 @layer utilities {
   .scrollbar-custom::-webkit-scrollbar {
     width: 6px;
@@ -12,7 +19,7 @@
   }
   .scrollbar-custom::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 4px;
+    border-radius: 9999px;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;

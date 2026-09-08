@@ -36,10 +36,9 @@ const FactsPage = () => {
       try {
         const params = { ...filters };
         if (search) params.search = search;
-        params.limit = 100; // Just fetching a batch for simplicity in UI
+        params.limit = 100;
         
         const data = await getFacts(params);
-        // Assuming API returns { items: [...], total: X } or just array
         if (Array.isArray(data)) {
            setFacts(data);
            setTotal(data.length);
@@ -59,32 +58,43 @@ const FactsPage = () => {
 
   return (
     <div className="space-y-6 flex flex-col h-full">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Fact Explorer</h1>
-        <p className="text-gray-500">Browse and filter all facts extracted from your documents.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1.5">
+          Fact Explorer
+        </h1>
+        <p className="text-sm text-gray-500">
+          Browse, search, and verify atomic facts extracted from source documents with grounded citations.
+        </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <FilterPanel filters={filters} setFilters={setFilters} documents={documents} />
-        <div className="w-full md:w-64">
+        <div className="w-full md:w-72">
           <SearchBar onSearch={setSearch} placeholder="Search statements..." />
         </div>
       </div>
 
-      <div className="text-sm text-gray-500 font-medium">
-        Showing {facts.length} {facts.length !== total && total > 0 ? `of ${total}` : ''} facts
+      {/* Meta Counter */}
+      <div className="flex items-center justify-between text-xs text-gray-500 font-medium px-1">
+        <span>
+          Showing <strong className="text-slate-800">{facts.length}</strong> {facts.length !== total && total > 0 ? `of ${total}` : ''} extracted facts
+        </span>
       </div>
 
+      {/* Facts Card Grid */}
       <div className="flex-1 overflow-auto pb-8">
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+          <div className="flex flex-col justify-center items-center py-20 text-slate-400 gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+            <span className="text-xs">Loading extracted facts...</span>
           </div>
         ) : facts.length === 0 ? (
           <EmptyState 
             icon={SearchX} 
             title="No facts found" 
-            description="Try adjusting your filters or search query, or upload more documents." 
+            description="Try adjusting your filter criteria or search keywords, or ingest additional documents." 
           />
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">

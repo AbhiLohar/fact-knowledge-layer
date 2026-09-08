@@ -2,25 +2,27 @@ import React from 'react';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
 const StatusBadge = ({ status }) => {
-  if (status === 'processing' || status === 'pending') {
+  const normStatus = (status || '').toLowerCase();
+
+  if (normStatus === 'processing' || normStatus === 'pending' || normStatus === 'extracting' || normStatus === 'analyzing' || normStatus === 'comparing') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-        <Loader2 className="w-3 h-3 animate-spin" />
-        Processing
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200/80">
+        <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
+        <span className="capitalize">{normStatus}</span>
       </span>
     );
   }
-  if (status === 'error' || status === 'failed') {
+  if (normStatus === 'error' || normStatus === 'failed') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-        <XCircle className="w-3 h-3" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200/80">
+        <XCircle className="w-3 h-3 text-rose-500" />
         Error
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-      <CheckCircle2 className="w-3 h-3" />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
       Complete
     </span>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UploadCloud, File, Trash2, AlertCircle } from 'lucide-react';
+import { UploadCloud, File, Trash2, AlertCircle, Sparkles, Clock, CheckCircle2 } from 'lucide-react';
 import { uploadDocument, getDocuments, deleteDocument } from '../api';
 import StatusBadge from '../components/StatusBadge';
 
@@ -25,7 +25,10 @@ const UploadPage = () => {
     // Auto-refresh if any doc is processing
     const interval = setInterval(() => {
       setDocuments((currentDocs) => {
-        const hasProcessing = currentDocs.some(d => d.status === 'processing' || d.status === 'pending');
+        const hasProcessing = currentDocs.some(d => 
+          d.status === 'processing' || d.status === 'pending' || 
+          d.status === 'EXTRACTING' || d.status === 'ANALYZING' || d.status === 'COMPARING'
+        );
         if (hasProcessing) {
           fetchDocuments();
         }
@@ -38,7 +41,7 @@ const UploadPage = () => {
 
   const handleUpload = async (file) => {
     if (!file || file.type !== 'application/pdf') {
-      setError('Please upload a valid PDF file.');
+      setError('Please upload a valid PDF document.');
       return;
     }
     
@@ -56,7 +59,7 @@ const UploadPage = () => {
 
   const onDragOver = (e) => {
     e.preventDefault();
-    setIsDragging(true);
+    setIsDragging(e);
   };
 
   const onDragLeave = () => {
@@ -72,7 +75,7 @@ const UploadPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this document?')) {
+    if (window.confirm('Are you sure you want to remove this document and all associated facts?')) {
       try {
         await deleteDocument(id);
         setDocuments(documents.filter(d => d.id !== id));
@@ -82,24 +85,38 @@ const UploadPage = () => {
     }
   };
 
+  const isAnyProcessing = documents.some(d => 
+    d.status === 'processing' || d.status === 'pending' || 
+    d.status === 'EXTRACTING' || d.status === 'ANALYZING' || d.status === 'COMPARING'
+  ) || uploading;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-5xl">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Upload Documents</h1>
-        <p className="text-gray-500">Upload PDF documents to extract facts and relationships.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1.5">
+          Document Ingestion
+        </h1>
+        <p className="text-sm text-gray-500">
+          Upload PDF filings and reports to extract grounded facts and detect cross-document relationships.
+        </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 border border-red-200">
-          <AlertCircle className="w-5 h-5 text-red-500" />
+        <div className="bg-rose-50 text-rose-700 p-4 rounded-xl flex items-center gap-3 border border-rose-200 shadow-sm text-sm">
+          <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
           <p>{error}</p>
         </div>
       )}
 
-      {/* Upload Zone */}
+      {/* Premium Linear-style Dropzone */}
       <div 
-        className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${
-          isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 bg-white hover:bg-gray-50'
+        className={`relative border-2 border-dashed rounded-xl p-10 md:p-14 text-center transition-all duration-200 cursor-pointer overflow-hidden ${
+          isDragging 
+            ? 'border-indigo-500 bg-blue-50/60 shadow-sm' 
+            : isAnyProcessing
+              ? 'border-indigo-400 bg-blue-50/30 animate-pulse'
+              : 'border-gray-300 bg-white hover:border-indigo-300 hover:bg-blue-50/50 shadow-sm'
         }`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -117,60 +134,87 @@ const UploadPage = () => {
             }
           }}
         />
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className={`p-4 rounded-full ${isDragging ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'}`}>
-            <UploadCloud className="w-8 h-8" />
+
+        <div className="flex flex-col items-center justify-center space-y-3">
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+            isDragging || uploading 
+              ? 'bg-indigo-600 text-white shadow-sm' 
+              : 'bg-slate-100 text-slate-600 border border-gray-200/80'
+          }`}>
+            <UploadCloud className="w-6 h-6" />
           </div>
-          <div>
-            <p className="text-lg font-medium text-gray-700">
-              {uploading ? 'Uploading...' : 'Drop PDF here or click to upload'}
+
+          <div className="space-y-1">
+            <p className="text-sm font-semibold tracking-tight text-slate-900">
+              {uploading ? 'Processing PDF pipeline...' : 'Click to upload or drag and drop'}
             </p>
-            <p className="text-sm text-gray-400 mt-1">Only PDF files are supported</p>
+            <p className="text-xs text-gray-500">
+              Supports corporate filings, annual reports, financial presentations, and surveys (PDF up to 100 pages)
+            </p>
           </div>
+
+          {isAnyProcessing && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-100/80 text-blue-800 mt-2">
+              <Sparkles className="w-3.5 h-3.5 animate-spin" />
+              <span>Pipeline active: extracting text, tables, and atomic facts</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Document List */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Documents</h2>
+      {/* Uploaded Documents List */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700">
+            Ingested Documents ({documents.length})
+          </h2>
+          {isAnyProcessing && (
+            <span className="text-xs text-indigo-600 font-medium animate-pulse flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" /> Auto-refreshing status...
+            </span>
+          )}
+        </div>
+
         {documents.length === 0 ? (
-          <p className="text-gray-500 text-sm italic">No documents uploaded yet.</p>
+          <div className="p-8 text-center bg-white rounded-xl border border-dashed border-gray-200">
+            <p className="text-xs text-gray-500">No documents ingested yet. Upload your first PDF above or run the demo seed script.</p>
+          </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-            <ul className="divide-y divide-gray-200">
-              {documents.map((doc) => (
-                <li key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
-                      <File className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{doc.filename}</p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-gray-500">
-                          {new Date(doc.upload_time).toLocaleString()}
-                        </span>
-                        <span className="text-xs text-gray-500">•</span>
-                        <span className="text-xs text-gray-500">
-                          {doc.fact_count || 0} facts
-                        </span>
-                      </div>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm divide-y divide-gray-100">
+            {documents.map((doc) => (
+              <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-slate-50/80 transition-colors">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 flex-shrink-0">
+                    <File className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate tracking-tight" title={doc.filename}>
+                      {doc.filename}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
+                      <span>{new Date(doc.upload_time).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>{doc.page_count || 0} pages</span>
+                      <span>•</span>
+                      <span className="font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded">
+                        {doc.fact_count || 0} facts
+                      </span>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <StatusBadge status={doc.status} />
-                    <button 
-                      onClick={() => handleDelete(doc.id)}
-                      className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
-                      title="Delete document"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                </div>
+                
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <StatusBadge status={doc.status} />
+                  <button 
+                    onClick={() => handleDelete(doc.id)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
+                    title="Delete document"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
