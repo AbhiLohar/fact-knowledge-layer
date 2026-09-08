@@ -31,12 +31,19 @@ async def get_facts(
         filtered = [f for f in filtered if f.get("fact_type", "").lower() == type_lower]
 
     if search:
-        s_lower = search.lower()
+        s_lower = search.strip().lower()
         filtered = [
             f for f in filtered 
             if s_lower in f.get("statement", "").lower() 
             or s_lower in f.get("source_quote", "").lower()
             or s_lower in (f.get("value") or "").lower()
+            or s_lower in (f.get("unit") or "").lower()
+            or s_lower in (f.get("time_context") or "").lower()
+            or s_lower in (f.get("scope_context") or "").lower()
+            or s_lower in (f.get("document_name") or "").lower()
+            or s_lower in (f.get("category") or "").lower()
+            or s_lower in (f.get("fact_type") or "").lower()
+            or any(s_lower in str(q).lower() for q in f.get("qualifiers", []))
         ]
 
     paginated = filtered[offset:offset + limit]

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getFacts, getDocuments } from '../api';
 import FactCard from '../components/FactCard';
 import FilterPanel from '../components/FilterPanel';
@@ -7,10 +7,9 @@ import EmptyState from '../components/EmptyState';
 import { SearchX, Loader2 } from 'lucide-react';
 
 const FactsPage = () => {
-  const [facts, setFacts] = useState([]);
+  const [allFacts, setAllFacts] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({
     document_id: '',
     category: '',
@@ -30,22 +29,17 @@ const FactsPage = () => {
     loadDocs();
   }, []);
 
+  // Fetch facts whenever document_id changes (or on initial load)
   useEffect(() => {
     const fetchFactsData = async () => {
       setLoading(true);
       try {
-        const params = { ...filters };
-        if (search) params.search = search;
-        params.limit = 100;
-        
-        const data = await getFacts(params);
-        if (Array.isArray(data)) {
-           setFacts(data);
-           setTotal(data.length);
-        } else {
-           setFacts(data.items || []);
-           setTotal(data.total || data.items?.length || 0);
+        const params = { limit: 250 };
+        if (filters.document_id) {
+          params.document_id = filters.document_id;
         }
+        const data = await getFacts(params);
+        setAllFacts(Array.isArray(data) ? data : (data.items || []));
       } catch (err) {
         console.error('Failed to load facts', err);
       } finally {
@@ -54,7 +48,55 @@ const FactsPage = () => {
     };
     
     fetchFactsData();
-  }, [filters, search]);
+  }, [filters.document_id]);
+
+  // Instant zero-latency live filtering across category, fact_type, and search query
+  const displayedFacts = useMemo(() => {
+    let list = allFacts;
+
+    if (filters.category) {
+      const catLower = filters.category.toLowerCase();
+      list = list.filter(f => (f.category || '').toLowerCase() === catLower);
+    }
+
+    if (filters.fact_type) {
+      const typeLower = filters.fact_type.toLowerCase();
+      list = list.filter(f => (f.fact_type || '').toLowerCase() === typeLower);
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(f => {
+        const statement = (f.statement || '').toLowerCase();
+        const quote = (f.source_quote || '').toLowerCase();
+        const val = (f.value || '').toLowerCase();
+        const unit = (f.unit || '').toLowerCase();
+        const time = (f.time_context || '').toLowerCase();
+        const scope = (f.scope_context || '').toLowerCase();
+        const doc = (f.document_name || '').toLowerCase();
+        const cat = (f.category || '').toLowerCase();
+        const type = (f.fact_type || '').toLowerCase();
+        const qualifiers = Array.isArray(f.qualifiers) ? f.qualifiers.join(' ').toLowerCase() : '';
+
+        return (
+          statement.includes(q) ||
+          quote.includes(q) ||
+          val.includes(q) ||
+          unit.includes(q) ||
+          time.includes(q) ||
+          scope.includes(q) ||
+          doc.includes(q) ||
+          cat.includes(q) ||
+          type.includes(q) ||
+          qualifiers.includes(q)
+        );
+      });
+    }
+
+    return list;
+  }, [allFacts, filters.category, filters.fact_type, search]);
+
+  const isFiltered = Boolean(filters.category || filters.fact_type || search.trim());
 
   return (
     <div className="space-y-6 flex flex-col h-full">
@@ -71,15 +113,16 @@ const FactsPage = () => {
       {/* Filter and Search Bar */}
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <FilterPanel filters={filters} setFilters={setFilters} documents={documents} />
-        <div className="w-full md:w-72">
-          <SearchBar onSearch={setSearch} placeholder="Search statements..." />
+        <div className="w-full md:w-80">
+          <SearchBar onSearch={setSearch} placeholder="Search statements, quotes, dates, metrics..." />
         </div>
       </div>
 
       {/* Meta Counter */}
       <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-medium px-1">
         <span>
-          Showing <strong className="text-slate-800 dark:text-slate-200">{facts.length}</strong> {facts.length !== total && total > 0 ? `of ${total}` : ''} extracted facts
+          Showing <strong className="text-slate-800 dark:text-slate-200">{displayedFacts.length}</strong> of {allFacts.length} extracted facts
+          {isFiltered && <span className="ml-1.5 text-indigo-600 dark:text-indigo-400 font-normal">(live filtered)</span>}
         </span>
       </div>
 
@@ -90,15 +133,15 @@ const FactsPage = () => {
             <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
             <span className="text-xs">Loading extracted facts...</span>
           </div>
-        ) : facts.length === 0 ? (
+        ) : displayedFacts.length === 0 ? (
           <EmptyState 
             icon={SearchX} 
-            title="No facts found" 
-            description="Try adjusting your filter criteria or search keywords, or ingest additional documents." 
+            title="No matching facts found" 
+            description={search ? `No facts matched "${search}". Try adjusting your keywords or clearing the search filter.` : "Try adjusting your filter criteria or ingest additional documents."} 
           />
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {facts.map(fact => (
+            {displayedFacts.map(fact => (
               <FactCard key={fact.id} fact={fact} />
             ))}
           </div>
