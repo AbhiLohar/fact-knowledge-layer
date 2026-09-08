@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getShowcase } from '../api';
 import FactCard from '../components/FactCard';
+import ConfidenceBadge from '../components/ConfidenceBadge';
 import EmptyState from '../components/EmptyState';
 import { Award, AlertTriangle, Loader2, CheckCircle, HelpCircle, Sparkles, AlertOctagon, ArrowRightLeft } from 'lucide-react';
 import { formatConfidence } from '../utils';
@@ -133,9 +134,7 @@ const ShowcasePage = () => {
                   <p className="text-xs text-gray-500 dark:text-slate-400">{conf.description}</p>
                 </div>
                 {data.confidence && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-200 dark:border-slate-700 shadow-xs self-start sm:self-auto flex-shrink-0">
-                    Confidence: {formatConfidence(data.confidence)}
-                  </span>
+                  <ConfidenceBadge confidence={data.confidence} />
                 )}
               </div>
               

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Quote, Calendar, Globe } from 'lucide-react';
 import DocumentBadge from './DocumentBadge';
+import ConfidenceBadge from './ConfidenceBadge';
 import { formatConfidence } from '../utils';
 
 const categoryStyles = {
@@ -35,9 +36,7 @@ const FactCard = ({ fact, expandable = true, compact = false }) => {
           )}
         </div>
         {!compact && (
-          <span className="text-[11px] font-medium text-slate-400 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-2 py-0.5 rounded border border-gray-200/60 dark:border-slate-700 flex-shrink-0">
-            Confidence: {formatConfidence(fact.confidence)}
-          </span>
+          <ConfidenceBadge confidence={fact.confidence} />
         )}
       </div>
 

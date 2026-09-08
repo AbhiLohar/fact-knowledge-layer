@@ -1,5 +1,6 @@
 import React from 'react';
 import FactCard from './FactCard';
+import ConfidenceBadge from './ConfidenceBadge';
 import { Link2, AlertTriangle, CheckCircle, HelpCircle, Sparkles, ArrowRightLeft } from 'lucide-react';
 import { formatConfidence } from '../utils';
 
@@ -50,9 +51,7 @@ const RelationCard = ({ relation }) => {
           </span>
         </div>
         
-        <span className="text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-gray-200 dark:border-slate-700 shadow-xs">
-          Confidence: {formatConfidence(relation.confidence)}
-        </span>
+        <ConfidenceBadge confidence={relation.confidence} />
       </div>
       
       {/* Side-by-Side Cards without any floating collision */}
