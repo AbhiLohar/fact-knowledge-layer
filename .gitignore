@@ -39,3 +39,8 @@ Thumbs.db
 # Archive files
 *.zip
 *.tar.gz
+
+# Personal notes and video guides
+DEMO_VIDEO_WALKTHROUGH.md
+*video*guide*
+*VIDEO*WALKTHROUGH*
