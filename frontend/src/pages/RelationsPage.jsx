@@ -12,7 +12,7 @@ const TABS = [
 ];
 
 const RelationsPage = () => {
-  const [relations, setRelations] = useState([]);
+  const [allRelations, setAllRelations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ALL');
 
@@ -20,8 +20,9 @@ const RelationsPage = () => {
     const fetchRelationsData = async () => {
       setLoading(true);
       try {
-        const data = await getRelations(activeTab === 'ALL' ? '' : activeTab);
-        setRelations(data);
+        // Fetch all relations to populate tab counters and enable instant filtering
+        const data = await getRelations();
+        setAllRelations(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load relations', err);
       } finally {
@@ -30,7 +31,20 @@ const RelationsPage = () => {
     };
     
     fetchRelationsData();
-  }, [activeTab]);
+  }, []);
+
+  // Compute counts for each category
+  const counts = {
+    ALL: allRelations.length,
+    CORROBORATES: allRelations.filter(r => r.relation_type === 'CORROBORATES').length,
+    CONTRADICTS: allRelations.filter(r => r.relation_type === 'CONTRADICTS').length,
+    RECONCILABLE: allRelations.filter(r => r.relation_type === 'RECONCILABLE').length,
+  };
+
+  // Filter based on active tab
+  const filteredRelations = activeTab === 'ALL'
+    ? allRelations
+    : allRelations.filter(r => r.relation_type === activeTab);
 
   return (
     <div className="space-y-6 h-full flex flex-col max-w-5xl">
@@ -44,21 +58,30 @@ const RelationsPage = () => {
         </p>
       </div>
 
-      {/* Segmented Pill Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-850 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm w-fit transition-colors">
+      {/* Segmented Tabs with Counters */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-white dark:bg-slate-850 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm w-fit transition-colors">
         {TABS.map(tab => {
           const isActive = activeTab === tab.id;
+          const count = counts[tab.id] || 0;
+
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
                 isActive 
                   ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-sm font-semibold' 
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/80 dark:hover:bg-slate-800/80'
               }`}
             >
-              {tab.label}
+              <span>{tab.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                isActive
+                  ? 'bg-slate-700 dark:bg-slate-300 text-slate-200 dark:text-slate-900'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-gray-200/60 dark:border-slate-700'
+              }`}>
+                {count}
+              </span>
             </button>
           );
         })}
@@ -69,9 +92,9 @@ const RelationsPage = () => {
         {loading ? (
           <div className="flex flex-col justify-center items-center py-20 text-slate-400 gap-2">
             <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
-            <span className="text-xs">Computing cross-document relationships...</span>
+            <span className="text-xs">Loading cross-document relationships...</span>
           </div>
-        ) : relations.length === 0 ? (
+        ) : filteredRelations.length === 0 ? (
           <EmptyState 
             icon={GitMerge} 
             title="No relationships found" 
@@ -79,7 +102,7 @@ const RelationsPage = () => {
           />
         ) : (
           <div className="space-y-4">
-            {relations.map(relation => (
+            {filteredRelations.map(relation => (
               <RelationCard key={relation.id} relation={relation} />
             ))}
           </div>

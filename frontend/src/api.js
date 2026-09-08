@@ -44,7 +44,7 @@ export const searchFacts = async (query) => {
 };
 
 export const getRelations = async (type) => {
-  const params = type ? { type } : {};
+  const params = type ? { relation_type: type, type } : {};
   const response = await api.get('/relations', { params });
   return response.data;
 };

@@ -21,9 +21,13 @@ async def _build_relation_response(rel_dict: dict) -> Optional[RelationResponse]
     )
 
 @router.get("", response_model=List[RelationResponse])
-async def get_relations(relation_type: Optional[str] = Query(None)):
-    if relation_type:
-        type_upper = relation_type.upper()
+async def get_relations(
+    relation_type: Optional[str] = Query(None),
+    type: Optional[str] = Query(None)
+):
+    filter_val = relation_type or type
+    if filter_val:
+        type_upper = filter_val.upper()
         raw_relations = await db.get_relations_by_type(type_upper)
     else:
         raw_relations = await db.get_relations()
