@@ -58,6 +58,7 @@ async def process_document_pipeline(document_id: int, filepath: str, filename: s
         logger.error(f"Error processing document {document_id}: {e}", exc_info=True)
         await db.update_document_status(document_id, ProcessingStatus.ERROR, error_message=str(e))
 
+@router.post("", response_model=DocumentResponse)
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     if not file.filename.lower().endswith(".pdf"):

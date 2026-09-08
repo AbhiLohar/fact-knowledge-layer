@@ -22,7 +22,7 @@ const UploadPage = () => {
   useEffect(() => {
     fetchDocuments();
     
-    // Auto-refresh if any doc is processing
+    // Fast auto-refresh if any doc is processing (2s for immediate feedback)
     const interval = setInterval(() => {
       setDocuments((currentDocs) => {
         const hasProcessing = currentDocs.some(d => 
@@ -34,7 +34,7 @@ const UploadPage = () => {
         }
         return currentDocs;
       });
-    }, 5000);
+    }, 2000);
     
     return () => clearInterval(interval);
   }, []);
@@ -85,10 +85,26 @@ const UploadPage = () => {
     }
   };
 
-  const isAnyProcessing = documents.some(d => 
+  const processingDoc = documents.find(d => 
     d.status === 'processing' || d.status === 'pending' || 
     d.status === 'EXTRACTING' || d.status === 'ANALYZING' || d.status === 'COMPARING'
-  ) || uploading;
+  );
+  const isAnyProcessing = Boolean(processingDoc) || uploading;
+
+  const getStageMessage = () => {
+    if (uploading) return 'Uploading file to server...';
+    if (!processingDoc) return 'Pipeline active: processing document...';
+    switch (processingDoc.status) {
+      case 'EXTRACTING':
+        return 'Step 1/3: Extracting text & tabular data with PyMuPDF...';
+      case 'ANALYZING':
+        return 'Step 2/3: Extracting and grounding atomic facts...';
+      case 'COMPARING':
+        return 'Step 3/3: Cross-document comparison & reconciliation...';
+      default:
+        return 'Pipeline active: extracting text, tables, and atomic facts';
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-5xl">
@@ -146,7 +162,7 @@ const UploadPage = () => {
 
           <div className="space-y-1">
             <p className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              {uploading ? 'Processing PDF pipeline...' : 'Click to upload or drag and drop'}
+              {uploading ? 'Uploading document...' : (isAnyProcessing ? 'Processing pipeline in progress...' : 'Click to upload or drag and drop')}
             </p>
             <p className="text-xs text-gray-500 dark:text-slate-400">
               Supports corporate filings, annual reports, financial presentations, and surveys (PDF up to 100 pages)
@@ -156,7 +172,7 @@ const UploadPage = () => {
           {isAnyProcessing && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-100/80 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mt-2">
               <Sparkles className="w-3.5 h-3.5 animate-spin" />
-              <span>Pipeline active: extracting text, tables, and atomic facts</span>
+              <span>{getStageMessage()}</span>
             </div>
           )}
         </div>
