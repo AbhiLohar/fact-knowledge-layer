@@ -5,10 +5,10 @@ import EmptyState from '../components/EmptyState';
 import { GitMerge, Loader2 } from 'lucide-react';
 
 const TABS = [
-  { id: 'ALL', label: 'All Relations', badge: 'bg-slate-100 text-slate-700 border-slate-200' },
-  { id: 'CORROBORATES', label: 'Corroborations', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  { id: 'CONTRADICTS', label: 'Contradictions', badge: 'bg-rose-50 text-rose-700 border-rose-200' },
-  { id: 'RECONCILABLE', label: 'Reconcilable', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { id: 'ALL', label: 'All Relations' },
+  { id: 'CORROBORATES', label: 'Corroborations' },
+  { id: 'CONTRADICTS', label: 'Contradictions' },
+  { id: 'RECONCILABLE', label: 'Reconcilable' },
 ];
 
 const RelationsPage = () => {
@@ -36,16 +36,16 @@ const RelationsPage = () => {
     <div className="space-y-6 h-full flex flex-col max-w-5xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1.5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1.5">
           Cross-Document Relationships
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           Analyze how facts across multiple filings corroborate, contradict, or reconcile through contextual differences.
         </p>
       </div>
 
       {/* Segmented Pill Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-white rounded-lg border border-gray-200 shadow-sm w-fit">
+      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-850 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm w-fit transition-colors">
         {TABS.map(tab => {
           const isActive = activeTab === tab.id;
           return (
@@ -54,8 +54,8 @@ const RelationsPage = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
                 isActive 
-                  ? 'bg-slate-900 text-white shadow-sm font-semibold' 
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-sm font-semibold' 
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/80 dark:hover:bg-slate-800/80'
               }`}
             >
               {tab.label}

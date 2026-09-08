@@ -19,7 +19,7 @@ const SearchBar = ({ onSearch, placeholder = "Search statements or evidence..." 
       </div>
       <input
         type="text"
-        className="block w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-lg shadow-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-colors"
+        className="block w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-slate-850 border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm placeholder-slate-400 dark:placeholder-slate-500 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-500 focus:border-slate-400 dark:focus:border-slate-500 transition-colors"
         placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}

@@ -60,10 +60,10 @@ const FactsPage = () => {
     <div className="space-y-6 flex flex-col h-full">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1.5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-1.5">
           Fact Explorer
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           Browse, search, and verify atomic facts extracted from source documents with grounded citations.
         </p>
       </div>
@@ -77,9 +77,9 @@ const FactsPage = () => {
       </div>
 
       {/* Meta Counter */}
-      <div className="flex items-center justify-between text-xs text-gray-500 font-medium px-1">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-medium px-1">
         <span>
-          Showing <strong className="text-slate-800">{facts.length}</strong> {facts.length !== total && total > 0 ? `of ${total}` : ''} extracted facts
+          Showing <strong className="text-slate-800 dark:text-slate-200">{facts.length}</strong> {facts.length !== total && total > 0 ? `of ${total}` : ''} extracted facts
         </span>
       </div>
 
