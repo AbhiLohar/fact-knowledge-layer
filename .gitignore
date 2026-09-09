@@ -40,7 +40,12 @@ Thumbs.db
 *.zip
 *.tar.gz
 
-# Personal notes and video guides
+# Personal notes, interview guides, and video walkthroughs
 DEMO_VIDEO_WALKTHROUGH.md
 *video*guide*
 *VIDEO*WALKTHROUGH*
+*INTERVIEW*
+*interview*
+*GUIDE*
+*guide*
+/*.pdf
