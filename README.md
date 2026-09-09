@@ -133,7 +133,7 @@ cd frontend && npm run build
 
 ## Video Demo
 
-- **Demo Video Link:** `https://youtube.com/watch?v=YOUR_VIDEO_ID` *(Replace with your 3-minute video link)*
+- **Demo Video Link:** https://drive.google.com/file/d/1y864xR951Gi8D6u5zwY908EnRjh5gcA9/view?usp=sharing
 - **Demo Video Duration:** $\le$ 3 minutes
 - **Walkthrough Highlights in the Video:**
   1. **Document Ingestion (0:00 – 0:45):** Uploading a PDF via the drag-and-drop UI, tracking the async pipeline states (*Extracting &rarr; Analyzing &rarr; Comparing &rarr; Complete*).
