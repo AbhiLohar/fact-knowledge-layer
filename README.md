@@ -241,8 +241,9 @@ The system demonstrates each of the four required cases with exact source quotes
 
 | Current Limitation | Proposed Engineering Next Step |
 | :--- | :--- |
-| **Complex Multi-Page Merged Tables** | Integrate vision-language models (e.g., GPT-4o Vision) for direct pixel-level table parsing. |
+| **Complex Multi-Page & Borderless Tables** | **Swap heuristic `pdfplumber` for IBM's Docling:** Integrate Docling's layout-aware parsing (`DocLayNet` reading-order model + `TableFormer`) to accurately parse borderless financial statements and complex multi-level merged headers where coordinate heuristics fail. |
 | **OCR for Scanned Documents** | Incorporate Tesseract OCR or docTR pipeline for non-searchable or scanned image PDFs. |
+| **Multimodal Graphic Charts** | Integrate vision-language models (e.g., GPT-4o Vision) for direct pixel-level parsing of infographics and donut charts. |
 | **Multi-Hop Graph Traversals** | Connect SQLite relation edges into Neo4j to enable multi-hop reasoning (e.g., Fact A &rarr; Fact B &rarr; Fact C). |
 | **Temporal Timeline UI** | Add an interactive timeline showing the chronological evolution of metrics across document publication dates. |
 
