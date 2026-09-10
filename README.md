@@ -143,6 +143,30 @@ cd frontend && npm run build
 
 ---
 
+## Application Preview
+
+### 1. Fact Explorer & Evidence Grounding
+*Zero-latency in-memory search across 10 metadata dimensions with expandable verbatim source citations, page references, and confidence badges.*
+
+![Fact Explorer](docs/screenshots/01-fact-explorer.png)
+
+### 2. Cross-Document Reconciliation & Forensic Reasoning
+*Side-by-side comparison matrix classifying relationships into Corroboration, Contradiction, and Reconcilable context with detailed LLM reasoning.*
+
+![Cross-Document Relations](docs/screenshots/02-cross-doc-relations.png)
+
+### 3. The Four Required Cases Showcase
+*Dedicated showcase screen demonstrating Corroboration, Contradiction, Reconcilable Context, and Extraction Failure handling.*
+
+![Four Required Cases Showcase](docs/screenshots/03-showcase-cases.png)
+
+### 4. PDF Ingestion & Asynchronous Pipeline
+*Drag-and-drop PDF upload with real-time status tracking across parsing, chunking, fact extraction, and comparison stages.*
+
+![Upload Pipeline](docs/screenshots/04-upload-pipeline.png)
+
+---
+
 ## Approach
 
 ### 1. AI Tools Used
